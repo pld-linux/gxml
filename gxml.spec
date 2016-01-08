@@ -1,16 +1,17 @@
 #
 # Conditional build:
-%bcond_without	static_libs	# don't build static libraries
+%bcond_with	apidocs		# API documentation [doesn't build up to 0.8.0 release]
+%bcond_without	static_libs	# static library
 #
 Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
-Version:	0.6.0
+Version:	0.8.0
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.6/%{name}-%{version}.tar.xz
-# Source0-md5:	3fbe11973c39aec1c0bf70264368b943
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.8/%{name}-%{version}.tar.xz
+# Source0-md5:	5fcc4a9a4e1f55750bbe3771957a76c8
 URL:		https://github.com/GNOME/gxml
 BuildRequires:	autoconf >= 2.65
 BuildRequires:	automake >= 1:1.11
@@ -25,8 +26,7 @@ BuildRequires:	pkgconfig >= 1:0.21
 BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	vala >= 2:0.26
-# needed only for docs regeneration
-#BuildRequires:	valadoc >= 0.3.1
+%{?with_apidocs:BuildRequires:	valadoc >= 0.3.1}
 BuildRequires:	yelp-tools
 BuildRequires:	xz
 Requires:	glib2 >= 1:2.32.0
@@ -92,7 +92,9 @@ API języka Vala dla biblioteki GXml.
 %configure \
 	--enable-gi-system-install \
 	--disable-silent-rules \
-	%{?with_static_libs:--enable-static}
+	%{?with_static_libs:--enable-static} \
+	%{?with_apidocs:--enable-docs --enable-gtk-docs --enable-valadoc}
+# --enable-gir-docs --enable-devhelp-docs ???
 %{__make}
 
 %install
@@ -106,17 +108,19 @@ rm -rf $RPM_BUILD_ROOT
 # packaged as %doc
 %{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc
 
+%find_lang GXml
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
-%files
+%files -f GXml.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README
 %attr(755,root,root) %{_libdir}/libgxml-0.6.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libgxml-0.6.so.6
+%attr(755,root,root) %ghost %{_libdir}/libgxml-0.6.so.8
 %{_libdir}/girepository-1.0/GXml-0.6.typelib
 
 %files devel
