@@ -2,12 +2,12 @@
 # Conditional build:
 %bcond_with	apidocs		# API documentation [doesn't build up to 0.8.0 release]
 %bcond_without	static_libs	# static library
-#
+
 Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
 Version:	0.8.2
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.8/%{name}-%{version}.tar.xz
@@ -27,8 +27,8 @@ BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	vala >= 2:0.26
 %{?with_apidocs:BuildRequires:	valadoc >= 0.3.1}
-BuildRequires:	yelp-tools
 BuildRequires:	xz
+BuildRequires:	yelp-tools
 Requires:	glib2 >= 1:2.32.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -72,6 +72,9 @@ Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 Requires:	vala >= 2:0.26
 Requires:	vala-libgee >= 0.10.5
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description -n vala-gxml
 Vala API for GXml library.
