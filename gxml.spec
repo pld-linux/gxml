@@ -6,16 +6,14 @@
 Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
-Version:	0.10.0
-Release:	2
+Version:	0.12.0
+Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.10/%{name}-%{version}.tar.xz
-# Source0-md5:	a268a60a6bc9fbad3f0fd580a0a93538
-Patch0:		%{name}-bug770449.patch
-Patch1:		%{name}-missing.patch
-Patch2:		%{name}-docs.patch
-Patch3:		%{name}-normalize.patch
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.12/%{name}-%{version}.tar.xz
+# Source0-md5:	203922473ca4c37dc7fef54b32764b91
+Patch0:		%{name}-missing.patch
+Patch1:		%{name}-normalize.patch
 URL:		https://github.com/GNOME/gxml
 BuildRequires:	autoconf >= 2.65
 BuildRequires:	automake >= 1:1.11
@@ -101,8 +99,6 @@ Dokumentacja API biblioteki GXml.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 %build
 %{__intltoolize}
@@ -127,7 +123,7 @@ rm -rf $RPM_BUILD_ROOT
 	gxmlgtkdocdir=%{_gtkdocdir}/gxml
 
 # obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgxml-0.10.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgxml-0.12.la
 # packaged as %doc
 %{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc
 
@@ -147,27 +143,27 @@ rm -rf $RPM_BUILD_ROOT
 %files -f GXml.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README
-%attr(755,root,root) %{_libdir}/libgxml-0.10.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libgxml-0.10.so.10
-%{_libdir}/girepository-1.0/GXml-0.10.typelib
+%attr(755,root,root) %{_libdir}/libgxml-0.12.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libgxml-0.12.so.12
+%{_libdir}/girepository-1.0/GXml-0.12.typelib
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libgxml-0.10.so
-%{_includedir}/gxml-0.10
-%{_datadir}/gir-1.0/GXml-0.10.gir
-%{_pkgconfigdir}/gxml-0.10.pc
+%attr(755,root,root) %{_libdir}/libgxml-0.12.so
+%{_includedir}/gxml-0.12
+%{_datadir}/gir-1.0/GXml-0.12.gir
+%{_pkgconfigdir}/gxml-0.12.pc
 
 %if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libgxml-0.10.a
+%{_libdir}/libgxml-0.12.a
 %endif
 
 %files -n vala-gxml
 %defattr(644,root,root,755)
-%{_datadir}/vala/vapi/gxml-0.10.deps
-%{_datadir}/vala/vapi/gxml-0.10.vapi
+%{_datadir}/vala/vapi/gxml-0.12.deps
+%{_datadir}/vala/vapi/gxml-0.12.vapi
 
 %if %{with apidocs}
 %files apidocs
