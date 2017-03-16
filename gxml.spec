@@ -6,12 +6,12 @@
 Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
-Version:	0.12.0
+Version:	0.14.0
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.12/%{name}-%{version}.tar.xz
-# Source0-md5:	203922473ca4c37dc7fef54b32764b91
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.14/%{name}-%{version}.tar.xz
+# Source0-md5:	70577a8d4c6610ed8cfda9a24e54c3b0
 Patch0:		%{name}-missing.patch
 Patch1:		%{name}-normalize.patch
 URL:		https://github.com/GNOME/gxml
@@ -100,6 +100,18 @@ Dokumentacja API biblioteki GXml.
 %patch0 -p1
 %patch1 -p1
 
+# missing file (or missing in makefile rules)
+install -d docs/valadoc/gtk-doc/gtk-doc/gxml/xml
+cat >>docs/valadoc/gtk-doc/gtk-doc/gxml/xml/gtkdocentities.ent <<EOF
+<!ENTITY package "gxml">
+<!ENTITY package_bugreport "">
+<!ENTITY package_name "gxml">
+<!ENTITY package_string "gxml %{version}">
+<!ENTITY package_tarname "gxml">
+<!ENTITY package_url "">
+<!ENTITY package_version "%{version}">
+EOF
+
 %build
 %{__intltoolize}
 %{__libtoolize}
@@ -108,11 +120,10 @@ Dokumentacja API biblioteki GXml.
 %{__autoheader}
 %{__automake}
 %configure \
+	%{!?with_apidocs:--disable-docs} \
 	--disable-silent-rules \
-	%{?with_static_libs:--enable-static} \
-	%{?with_apidocs:--enable-docs --enable-gtk-docs --enable-valadoc}
-# --enable-devhelp-docs is almost the same as gtk-docs html, but built with valadoc(?) and installed to devhelp dirs
-# --enable-gir-docs ???
+	%{?with_static_libs:--enable-static}
+
 %{__make}
 
 %install
@@ -123,13 +134,16 @@ rm -rf $RPM_BUILD_ROOT
 	gxmlgtkdocdir=%{_gtkdocdir}/gxml
 
 # obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgxml-0.12.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgxml-0.14.la
 # packaged as %doc
 %{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc
 
 # what a mess... gtk-doc XML intermediate files are installed to html dir...
 %{__rm} -r $RPM_BUILD_ROOT%{_gtkdocdir}/gxml/*.{bottom,top,stamp,txt,types,xml}
 cp -p docs/valadoc/gtk-doc/gtk-doc/gxml/html/* $RPM_BUILD_ROOT%{_gtkdocdir}/gxml
+
+# similar to gtk-doc?
+%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/devhelp
 
 # "GXml" gettext domain, "gxml" gnome help
 %find_lang GXml --with-gnome --all-name
@@ -143,27 +157,27 @@ rm -rf $RPM_BUILD_ROOT
 %files -f GXml.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README
-%attr(755,root,root) %{_libdir}/libgxml-0.12.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libgxml-0.12.so.12
-%{_libdir}/girepository-1.0/GXml-0.12.typelib
+%attr(755,root,root) %{_libdir}/libgxml-0.14.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libgxml-0.14.so.14
+%{_libdir}/girepository-1.0/GXml-0.14.typelib
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libgxml-0.12.so
-%{_includedir}/gxml-0.12
-%{_datadir}/gir-1.0/GXml-0.12.gir
-%{_pkgconfigdir}/gxml-0.12.pc
+%attr(755,root,root) %{_libdir}/libgxml-0.14.so
+%{_includedir}/gxml-0.14
+%{_datadir}/gir-1.0/GXml-0.14.gir
+%{_pkgconfigdir}/gxml-0.14.pc
 
 %if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libgxml-0.12.a
+%{_libdir}/libgxml-0.14.a
 %endif
 
 %files -n vala-gxml
 %defattr(644,root,root,755)
-%{_datadir}/vala/vapi/gxml-0.12.deps
-%{_datadir}/vala/vapi/gxml-0.12.vapi
+%{_datadir}/vala/vapi/gxml-0.14.deps
+%{_datadir}/vala/vapi/gxml-0.14.vapi
 
 %if %{with apidocs}
 %files apidocs
