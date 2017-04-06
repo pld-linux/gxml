@@ -6,12 +6,12 @@
 Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
-Version:	0.14.1
+Version:	0.14.2
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.14/%{name}-%{version}.tar.xz
-# Source0-md5:	e93b1ae171becf812032bb70e82adad1
+# Source0-md5:	21a6bb67acc93100d2c88012b9dc2a6c
 Patch0:		%{name}-missing.patch
 Patch1:		%{name}-normalize.patch
 URL:		https://github.com/GNOME/gxml
