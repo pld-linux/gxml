@@ -6,14 +6,13 @@
 Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
-Version:	0.14.2
+Version:	0.14.3
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.14/%{name}-%{version}.tar.xz
-# Source0-md5:	21a6bb67acc93100d2c88012b9dc2a6c
-Patch0:		%{name}-missing.patch
-Patch1:		%{name}-normalize.patch
+# Source0-md5:	1c30d72ca8b7294072268ca125c9a50b
+Patch0:		%{name}-normalize.patch
 URL:		https://github.com/GNOME/gxml
 BuildRequires:	autoconf >= 2.65
 BuildRequires:	automake >= 1:1.11
@@ -21,14 +20,14 @@ BuildRequires:	gettext-tools >= 0.18.1
 BuildRequires:	glib2-devel >= 1:2.32.0
 BuildRequires:	gobject-introspection-devel >= 1.32.0
 BuildRequires:	intltool >= 0.35.0
-BuildRequires:	libgee-devel >= 0.10.5
+BuildRequires:	libgee-devel >= 0.18.0
 BuildRequires:	libtool >= 2:2
 BuildRequires:	libxml2-devel >= 1:2.7
 BuildRequires:	pkgconfig >= 1:0.21
 BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.22
-BuildRequires:	vala >= 2:0.26
-%{?with_apidocs:BuildRequires:	valadoc >= 0.3.1}
+BuildRequires:	vala >= 2:0.34.6
+%{?with_apidocs:BuildRequires:	valadoc >= 0.30}
 BuildRequires:	xz
 BuildRequires:	yelp-tools
 Requires:	glib2 >= 1:2.32.0
@@ -46,7 +45,7 @@ Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki GXml
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	glib2-devel >= 1:2.32.0
-Requires:	libgee-devel >= 0.10.5
+Requires:	libgee-devel >= 0.18.0
 Requires:	libxml2-devel >= 1:2.7
 
 %description devel
@@ -72,8 +71,8 @@ Summary:	Vala API for GXml library
 Summary(pl.UTF-8):	API języka Vala dla biblioteki GXml
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
-Requires:	vala >= 2:0.26
-Requires:	vala-libgee >= 0.10.5
+Requires:	vala >= 2:0.34.6
+Requires:	vala-libgee >= 0.18.0
 %if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
 %endif
@@ -98,19 +97,6 @@ Dokumentacja API biblioteki GXml.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
-
-# missing file (or missing in makefile rules)
-install -d docs/valadoc/gtk-doc/gtk-doc/gxml/xml
-cat >>docs/valadoc/gtk-doc/gtk-doc/gxml/xml/gtkdocentities.ent <<EOF
-<!ENTITY package "gxml">
-<!ENTITY package_bugreport "">
-<!ENTITY package_name "gxml">
-<!ENTITY package_string "gxml %{version}">
-<!ENTITY package_tarname "gxml">
-<!ENTITY package_url "">
-<!ENTITY package_version "%{version}">
-EOF
 
 %build
 %{__intltoolize}
