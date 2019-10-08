@@ -1,17 +1,17 @@
 #
 # Conditional build:
-%bcond_without	apidocs		# API documentation
+%bcond_with	apidocs		# API documentation (no longer supported in autotools build, meson build is broken)
 %bcond_without	static_libs	# static library
 
 Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
-Version:	0.14.3
+Version:	0.18.1
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.14/%{name}-%{version}.tar.xz
-# Source0-md5:	1c30d72ca8b7294072268ca125c9a50b
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.18/%{name}-%{version}.tar.xz
+# Source0-md5:	a5fce2147184eb55571305858b9f4d03
 Patch0:		%{name}-normalize.patch
 URL:		https://github.com/GNOME/gxml
 BuildRequires:	autoconf >= 2.65
@@ -26,7 +26,7 @@ BuildRequires:	libxml2-devel >= 1:2.7
 BuildRequires:	pkgconfig >= 1:0.21
 BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.22
-BuildRequires:	vala >= 2:0.34.6
+BuildRequires:	vala >= 2:0.34.7
 %{?with_apidocs:BuildRequires:	valadoc >= 0.30}
 BuildRequires:	xz
 BuildRequires:	yelp-tools
@@ -71,7 +71,7 @@ Summary:	Vala API for GXml library
 Summary(pl.UTF-8):	API języka Vala dla biblioteki GXml
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
-Requires:	vala >= 2:0.34.6
+Requires:	vala >= 2:0.34.7
 Requires:	vala-libgee >= 0.18.0
 %if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
@@ -99,6 +99,7 @@ Dokumentacja API biblioteki GXml.
 %patch0 -p1
 
 %build
+%if 1
 %{__intltoolize}
 %{__libtoolize}
 %{__aclocal} -I m4
@@ -111,25 +112,37 @@ Dokumentacja API biblioteki GXml.
 	%{?with_static_libs:--enable-static}
 
 %{__make}
+%else
+%meson build \
+	%{?with_apidocs:-Ddocs=true} \
+	-Dintrospection=true
+
+%ninja_build -C build
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
+%if 1
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	gxmlgtkdocdir=%{_gtkdocdir}/gxml
 
 # obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgxml-0.14.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgxml-0.16.la
 # packaged as %doc
-%{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/gxml
 
-# what a mess... gtk-doc XML intermediate files are installed to html dir...
-%{__rm} -r $RPM_BUILD_ROOT%{_gtkdocdir}/gxml/*.{bottom,top,stamp,txt,types,xml}
-cp -p docs/valadoc/gtk-doc/gtk-doc/gxml/html/* $RPM_BUILD_ROOT%{_gtkdocdir}/gxml
-
-# similar to gtk-doc?
-%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/devhelp
+# gtk-doc no longer supported in autotools build
+## what a mess... gtk-doc XML intermediate files are installed to html dir...
+#%{__rm} -r $RPM_BUILD_ROOT%{_gtkdocdir}/gxml/*.{bottom,top,stamp,txt,types,xml}
+#cp -p docs/valadoc/gtk-doc/gtk-doc/gxml/html/* $RPM_BUILD_ROOT%{_gtkdocdir}/gxml
+#
+## similar to gtk-doc?
+#%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/devhelp
+%else
+%ninja_install -C build
+%endif
 
 # "GXml" gettext domain, "gxml" gnome help
 %find_lang GXml --with-gnome --all-name
@@ -143,27 +156,27 @@ rm -rf $RPM_BUILD_ROOT
 %files -f GXml.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README
-%attr(755,root,root) %{_libdir}/libgxml-0.14.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libgxml-0.14.so.14
-%{_libdir}/girepository-1.0/GXml-0.14.typelib
+%attr(755,root,root) %{_libdir}/libgxml-0.16.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libgxml-0.16.so.3
+%{_libdir}/girepository-1.0/GXml-0.16.typelib
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libgxml-0.14.so
-%{_includedir}/gxml-0.14
-%{_datadir}/gir-1.0/GXml-0.14.gir
-%{_pkgconfigdir}/gxml-0.14.pc
+%attr(755,root,root) %{_libdir}/libgxml-0.16.so
+%{_includedir}/gxml-0.16
+%{_datadir}/gir-1.0/GXml-0.16.gir
+%{_pkgconfigdir}/gxml-0.16.pc
 
 %if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libgxml-0.14.a
+%{_libdir}/libgxml-0.16.a
 %endif
 
 %files -n vala-gxml
 %defattr(644,root,root,755)
-%{_datadir}/vala/vapi/gxml-0.14.deps
-%{_datadir}/vala/vapi/gxml-0.14.vapi
+%{_datadir}/vala/vapi/gxml-0.16.deps
+%{_datadir}/vala/vapi/gxml-0.16.vapi
 
 %if %{with apidocs}
 %files apidocs

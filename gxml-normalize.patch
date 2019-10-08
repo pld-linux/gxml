@@ -1,11 +1,11 @@
---- gxml-0.14.0/vapi/xlibxml-1.0.vapi.orig	2017-03-15 21:27:43.639306478 +0100
-+++ gxml-0.14.0/vapi/xlibxml-1.0.vapi	2017-03-15 21:31:53.455970292 +0100
-@@ -28,7 +28,7 @@
- namespace Xmlx {
+--- gxml-0.18.1/vapi/xlibxml-1.0.vapi.orig	2019-10-08 19:38:00.513178372 +0200
++++ gxml-0.18.1/vapi/xlibxml-1.0.vapi	2019-10-08 20:04:55.974426668 +0200
+@@ -29,7 +29,7 @@
    [CCode (cname = "gxml_doc_get_intsubset_entities", cheader_filename = "gxml/xlibxml.h")]
+   [Version (deprecated="true", since="0.15")]
    public static Xml.HashTable doc_get_dtd_entities (Xml.Doc *doc);
 -  [CCode (cname = "gxml_validate_name", cheader_filename = "gxml//xlibxml.h")]
 +  [CCode (cname = "gxml_validate_name", cheader_filename = "gxml/xlibxml.h")]
+   [Version (deprecated="true", since="0.15")]
    public static int validate_name ([CCode (type = "xmlChar*")] string name, int space);
    [CCode (cname = "gxml_parser_context_get_last_error", cheader_filename = "gxml/xlibxml.h")]
-   [Version (deprecated=true, replacement = "context_get_last_error", deprecated_since = "0.8.1")]
