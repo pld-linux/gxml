@@ -1,28 +1,25 @@
 #
 # Conditional build:
-%bcond_with	apidocs		# API documentation (no longer supported in autotools build, meson build is broken)
+%bcond_without	apidocs		# API documentation
 %bcond_without	static_libs	# static library
 
 Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
-Version:	0.18.1
+Version:	0.20.0
 Release:	1
 License:	LGPL v2.1+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.18/%{name}-%{version}.tar.xz
-# Source0-md5:	a5fce2147184eb55571305858b9f4d03
-Patch0:		%{name}-normalize.patch
-URL:		https://github.com/GNOME/gxml
-BuildRequires:	autoconf >= 2.65
-BuildRequires:	automake >= 1:1.11
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.20/%{name}-%{version}.tar.xz
+# Source0-md5:	6ee8f2e8f555a76de87cc293dee2106a
+URL:		https://wiki.gnome.org/GXml
 BuildRequires:	gettext-tools >= 0.18.1
 BuildRequires:	glib2-devel >= 1:2.32.0
 BuildRequires:	gobject-introspection-devel >= 1.32.0
-BuildRequires:	intltool >= 0.35.0
 BuildRequires:	libgee-devel >= 0.18.0
-BuildRequires:	libtool >= 2:2
 BuildRequires:	libxml2-devel >= 1:2.7
+BuildRequires:	meson
+BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig >= 1:0.21
 BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.22
@@ -73,7 +70,7 @@ Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 Requires:	vala >= 2:0.34.7
 Requires:	vala-libgee >= 0.18.0
-%if "%{_rpmversion}" >= "5"
+%if "%{_rpmversion}" >= "4.6"
 BuildArch:	noarch
 %endif
 
@@ -96,56 +93,32 @@ Dokumentacja API biblioteki GXml.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
-%if 1
-%{__intltoolize}
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__autoheader}
-%{__automake}
-%configure \
-	%{!?with_apidocs:--disable-docs} \
-	--disable-silent-rules \
-	%{?with_static_libs:--enable-static}
+%if %{with static_libs}
+%meson build-static \
+	--default-library=static \
+	-Ddocs=false
 
-%{__make}
-%else
+%ninja_build -C build-static
+%endif
+
 %meson build \
-	%{?with_apidocs:-Ddocs=true} \
-	-Dintrospection=true
+	--default-library=shared \
+	%{!?with_apidocs:-Ddocs=false}
 
 %ninja_build -C build
-%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%if 1
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT \
-	gxmlgtkdocdir=%{_gtkdocdir}/gxml
-
-# obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libgxml-0.16.la
-# packaged as %doc
-%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/gxml
-
-# gtk-doc no longer supported in autotools build
-## what a mess... gtk-doc XML intermediate files are installed to html dir...
-#%{__rm} -r $RPM_BUILD_ROOT%{_gtkdocdir}/gxml/*.{bottom,top,stamp,txt,types,xml}
-#cp -p docs/valadoc/gtk-doc/gtk-doc/gxml/html/* $RPM_BUILD_ROOT%{_gtkdocdir}/gxml
-#
-## similar to gtk-doc?
-#%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/devhelp
-%else
-%ninja_install -C build
+%if %{with static_libs}
+%ninja_install -C build-static
 %endif
 
-# "GXml" gettext domain, "gxml" gnome help
-%find_lang GXml --with-gnome --all-name
+%ninja_install -C build
+
+%find_lang GXml-0.20
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -153,33 +126,33 @@ rm -rf $RPM_BUILD_ROOT
 %post	-p /sbin/ldconfig
 %postun	-p /sbin/ldconfig
 
-%files -f GXml.lang
+%files -f GXml-0.20.lang
 %defattr(644,root,root,755)
-%doc AUTHORS ChangeLog NEWS README
-%attr(755,root,root) %{_libdir}/libgxml-0.16.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libgxml-0.16.so.3
-%{_libdir}/girepository-1.0/GXml-0.16.typelib
+%doc AUTHORS MAINTAINERS NEWS README
+%attr(755,root,root) %{_libdir}/libgxml-0.20.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libgxml-0.20.so.2
+%{_libdir}/girepository-1.0/GXml-0.20.typelib
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libgxml-0.16.so
-%{_includedir}/gxml-0.16
-%{_datadir}/gir-1.0/GXml-0.16.gir
-%{_pkgconfigdir}/gxml-0.16.pc
+%attr(755,root,root) %{_libdir}/libgxml-0.20.so
+%{_includedir}/gxml-0.20
+%{_datadir}/gir-1.0/GXml-0.20.gir
+%{_pkgconfigdir}/gxml-0.20.pc
 
 %if %{with static_libs}
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libgxml-0.16.a
+%{_libdir}/libgxml-0.20.a
 %endif
 
 %files -n vala-gxml
 %defattr(644,root,root,755)
-%{_datadir}/vala/vapi/gxml-0.16.deps
-%{_datadir}/vala/vapi/gxml-0.16.vapi
+%{_datadir}/vala/vapi/gxml-0.20.deps
+%{_datadir}/vala/vapi/gxml-0.20.vapi
 
 %if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
-%{_gtkdocdir}/gxml
+%{_datadir}/devhelp/books/GXml-0.20
 %endif
