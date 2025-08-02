@@ -7,7 +7,7 @@ Summary:	GXml - GObject API that wraps around libxml2
 Summary(pl.UTF-8):	GXml - API GObject obudowujące libxml2
 Name:		gxml
 Version:	0.20.0
-Release:	3
+Release:	4
 License:	LGPL v2.1+
 Group:		Libraries
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/gxml/0.20/%{name}-%{version}.tar.xz
@@ -94,27 +94,32 @@ Dokumentacja API biblioteki GXml.
 
 %build
 %if %{with static_libs}
-%meson build-static \
+%meson \
 	--default-library=static \
 	-Ddocs=false
 
-%ninja_build -C build-static
+%meson_build
+mv build build-static
 %endif
 
-%meson build \
+%meson \
 	--default-library=shared \
 	%{!?with_apidocs:-Ddocs=false}
 
-%ninja_build -C build
+%meson_build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 %if %{with static_libs}
-%ninja_install -C build-static
+mv build build-dynamic
+mv build-static build
+%meson_install
+mv build build-static
+mv build-dynamic build
 %endif
 
-%ninja_install -C build
+%meson_install
 
 %find_lang GXml-0.20
 
